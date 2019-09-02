@@ -452,23 +452,33 @@ for (var key in params) {
 // Main request loop
 async.timesLimit( max_iter, max_threads,
 	function(idx, callback) {
-		var temp_opts = Object.assign({}, opts);
-		var temp_url = url;
+		var current_opts = Object.assign({}, opts);
+		current_opts.headers = Object.assign({}, opts.headers);
+		var current_url = url;
 		var ebrake = 0;
 		
-		while (temp_url.match(/\[(\w+|\d+\-\d+)\]/)) {
-			temp_url = temp_url.replace( /\[(\d+)\-(\d+)\]/g, function(m_all, m_g1, m_g2) {
+		// apply placeholder substitution on URL
+		while (current_url.match(/\[(\w+|\d+\-\d+)\]/)) {
+			current_url = current_url.replace( /\[(\d+)\-(\d+)\]/g, function(m_all, m_g1, m_g2) {
 				var low = parseInt(m_g1);
 				var high = parseInt(m_g2);
 				return Math.round( low + ((high - low) * Math.random()) );
 			});
-			temp_url = temp_url.replace( /\[(\w+)\]/g, function(m_all, key) {
+			current_url = current_url.replace( /\[(\w+)\]/g, function(m_all, key) {
 				return params[key] ? Tools.randArray(params[key]) : '';
 			});
 			if (++ebrake > 32) break;
 		}
 		
-		request[method]( temp_url, temp_opts, function(err, resp, data, perf) {
+		// Allow URL to override headers for current request only
+		// Example: "/ads?place=yahoo&size=160x600&chan=tst&cb=1234 [header:Cookie:dtuid=tor00355;]"
+		current_url = current_url.replace(/\s*\[header\:\s*([\w\-]+)\:\s*([^\]]+)\]/ig, function(m_all, m_g1, m_g2) {
+			current_opts.headers[ m_g1 ] = m_g2;
+			return '';
+		}).trim();
+		
+		// send HTTP request
+		request[method]( current_url, current_opts, function(err, resp, data, perf) {
 			
 			// Track req/sec
 			var now_sec = Tools.timeNow(true);
@@ -501,7 +511,7 @@ async.timesLimit( max_iter, max_threads,
 			
 			// process metrics
 			var metrics = perf ? perf.metrics() : { perf: { total: 0 }, counters: {} };
-			metrics.url = temp_url;
+			metrics.url = current_url;
 			
 			var is_warning = !!(warn_ms && (metrics.perf.total >= warn_ms));
 			if (is_warning) {
