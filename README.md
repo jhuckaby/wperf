@@ -73,7 +73,7 @@ During a run, the script will display a graphical progress bar with estimated ti
 Use [npm](https://www.npmjs.com/) to install the module as a command-line executable:
 
 ```
-sudo npm install -g wperf
+npm install -g wperf
 ```
 
 Then call it using `wperf` and specify your URL and options on the command-line:
