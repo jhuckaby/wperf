@@ -59,8 +59,7 @@ var url = args.other.shift();
 
 print("\n");
 print( bold.magenta("WebPerf (wperf) v" + package.version) + "\n" );
-print( gray( bold("Date/Time: ") + (new Date()).toString() ) + "\n" );
-
+print( bold.gray("Date/Time: " + (new Date()).toString()) + "\n" );
 // first argument may be config file
 if (!url.match(/^\w+\:\/\//) && fs.existsSync(url)) {
 	var config = null;
@@ -71,7 +70,7 @@ if (!url.match(/^\w+\:\/\//) && fs.existsSync(url)) {
 	if (!config.url) {
 		die("Configuration file is missing required 'url' property: " + url + "\n");
 	}
-	print( gray( bold("Configuration: ") + url) + "\n" );
+	print( bold.gray("Configuration: " + url) + "\n" );
 	url = args.url || config.url;
 	for (var key in config) {
 		if (!(key in args)) args[key] = config[key];
@@ -96,12 +95,12 @@ if (("color" in args) && !args.color) {
 	cli.chalk.enabled = false;
 }
 
-if (args.params) print( gray( bold("Base URL: ") + url + " (" + method.toUpperCase() + ")") + "\n" );
-else print( gray( bold("URL: ") + url + " (" + method.toUpperCase() + ")") + "\n" );
+if (args.params) print( bold.gray("URL: " + url + "\n" ));
+else print( bold.gray("URL: (" + method.toUpperCase() + ") " + url) + "\n" );
 
 // print( gray( bold("Method: ") + method.toUpperCase()) + "\n" );
-print( gray( bold("Keep-Alives: ") + (keep_alive ? 'Enabled' : 'Disabled')) + "\n" );
-print( gray( bold("Threads: ") + max_threads) + "\n" );
+print( bold.gray("Keep-Alives: " + (keep_alive ? 'Enabled' : 'Disabled')) + "\n" );
+print( bold.gray("Threads: " + max_threads) + "\n" );
 
 // setup histogram system
 var histo = {};
@@ -522,7 +521,9 @@ async.timesLimit( max_iter, max_threads,
 			if (args.verbose || is_warning) {
 				// In verbose mode, print every success and perf metrics
 				cli.progress.erase();
-				cli[is_warning ? 'warn' : 'verbose']( dateTimeStamp() + (is_warning ? bold.red("Perf Warning: ") : '') + 'Req #' + count + ": HTTP " + resp.statusCode + " " + resp.statusMessage + " -- " + JSON.stringify(metrics) + "\n" );
+				if(resp && resp.statusCode) { // resp null check
+					cli[is_warning ? 'warn' : 'verbose']( dateTimeStamp() + (is_warning ? bold.red("Perf Warning: ") : '') + 'Req #' + count + ": HTTP " + resp.statusCode + " " + resp.statusMessage + " -- " + JSON.stringify(metrics) + "\n" );
+				}
 				cli.progress.draw();
 			}
 			
