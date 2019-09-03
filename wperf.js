@@ -56,8 +56,10 @@ if (!args.other || !args.other.length || args.help) {
 	print( RegExp.$1 + "\n" );
 	process.exit(0);
 }
-var url = args.other.shift();
 
+print("\n" + bold.magenta("WebPerf (wperf) v" + package.version) + "\n" );
+
+var url = args.other.shift();
 // first argument may be config file
 if (!url.match(/^\w+\:\/\//) && fs.existsSync(url)) {
 	var config = null;
@@ -84,7 +86,6 @@ if(logging) {
 	cli.setLogFile(logging);
 }
 
-print("\n" + bold.magenta("WebPerf (wperf) v" + package.version) + "\n" );
 print( gray.bold("Date/Time: ") + gray(new Date()).toString() + "\n" );
 
 // support string "false" as boolean false in certain cases
@@ -106,7 +107,7 @@ if (("color" in args) && !args.color) {
 }
 
 if (args.params) print( bold.gray("URL: ") + gray(url) + "\n" );
-else print( bold.gray("URL: (" + method.toUpperCase() + ") ") + gray(url) + "\n" );
+else print( bold.gray("URL: [" + method.toUpperCase() + "] ") + gray(url) + "\n" );
 
 // print( gray( bold("Method: ") + method.toUpperCase()) + "\n" );
 print( bold.gray("Keep-Alives: ") + gray(keep_alive ? 'Enabled' : 'Disabled') + "\n" );
