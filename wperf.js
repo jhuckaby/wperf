@@ -8,24 +8,25 @@
 /* <Help>
 Usage: wperf URL [OPTIONS...]
 
-	--max 1000        Total number of requests to send.
-	--threads 1       Number of concurrent threads to use.
-	--keepalive 0     Use HTTP Keep-Alive sockets.
-	--throttle 0      Limit request rate to N per sec.
-	--timeout 5       Timeout for each request in seconds.
-	--fatal 0         Abort on first HTTP error.
-	--verbose 0       Print metrics for every request.
-	--warn 1.0        Emit warnings at N seconds and longer.
-	--cache_dns 0     Cache DNS for duration of run.
-	--compress 1      Allow compressed responses.
-	--follow          Follow HTTP 3xx redirects.
-	--retries 5	      Retry errors N times.
-	--auth "U:P"      HTTP Basic Auth (username:password).
-	--useragent "Foo" Custom User-Agent string.
-	--h_X-Test "foo"  Add any HTTP request headers.
-	--method get      Specify HTTP request method.
-	--f_file1 "1.txt" Attach file to HTTP POST request.
-	--data "foo=bar"  Provide raw HTTP POST data.
+	--max 1000        		Total number of requests to send.
+	--threads 1       		Number of concurrent threads to use.
+	--keepalive 0     		Use HTTP Keep-Alive sockets.
+	--throttle 0      		Limit request rate to N per sec.
+	--timeout 5       		Timeout for each request in seconds.
+	--fatal 0         		Abort on first HTTP error.
+	--verbose 0       		Print metrics for every request.
+	--warn 1.0        		Emit warnings at N seconds and longer.
+	--cache_dns 0     		Cache DNS for duration of run.
+	--compress 1      		Allow compressed responses.
+	--follow          		Follow HTTP 3xx redirects.
+	--retries 5	      		Retry errors N times.
+	--auth "U:P"      		HTTP Basic Auth (username:password).
+	--useragent "Foo" 		Custom User-Agent string.
+	--h_X-Test "foo"  		Add any HTTP request headers.
+	--method get      		Specify HTTP request method.
+	--f_file1 "1.txt"		Attach file to HTTP POST request.
+	--data "foo=bar"  		Provide raw HTTP POST data.
+	--logging "wperf.log"
 
 Hit Ctrl-Z during run to see progress reports.
 For more info: https://github.com/jhuckaby/wperf
@@ -57,9 +58,6 @@ if (!args.other || !args.other.length || args.help) {
 }
 var url = args.other.shift();
 
-print("\n");
-print( bold.magenta("WebPerf (wperf) v" + package.version) + "\n" );
-print( gray.bold("Date/Time: ") + gray(new Date()).toString() + "\n" );
 // first argument may be config file
 if (!url.match(/^\w+\:\/\//) && fs.existsSync(url)) {
 	var config = null;
@@ -76,6 +74,18 @@ if (!url.match(/^\w+\:\/\//) && fs.existsSync(url)) {
 		if (!(key in args)) args[key] = config[key];
 	}
 }
+
+// logging to file support
+var logging = null; //args.logging || "wperf.log";
+if(args.logging) {
+	logging = args.logging;
+}
+if(logging) {
+	cli.setLogFile(logging);
+}
+
+print("\n" + bold.magenta("WebPerf (wperf) v" + package.version) + "\n" );
+print( gray.bold("Date/Time: ") + gray(new Date()).toString() + "\n" );
 
 // support string "false" as boolean false in certain cases
 if (args.compress === "false") args.compress = false;
@@ -101,6 +111,7 @@ else print( bold.gray("URL: (" + method.toUpperCase() + ") ") + gray(url) + "\n"
 // print( gray( bold("Method: ") + method.toUpperCase()) + "\n" );
 print( bold.gray("Keep-Alives: ") + gray(keep_alive ? 'Enabled' : 'Disabled') + "\n" );
 print( bold.gray("Threads: ") + gray(max_threads) + "\n" );
+print( bold.gray("Logging: ") + gray(logging ? "Enabled (" + logging + ")" : "Disabled") + "\n" );
 
 // setup histogram system
 var histo = {};
@@ -254,7 +265,7 @@ var stats = {
 	time_start: Tools.timeNow()
 };
 
-print( "\n" );
+print( "\nStarting...\n" );
 
 // Begin progress bar
 cli.progress.start({
@@ -328,8 +339,7 @@ var printReport = function() {
 	} ); // forEach
 	
 	print( "\n" );
-	print( bold("Performance Metrics:") + "\n" );
-	print( table(rows, { textStyles: ["green"] }) + "\n" );
+	print( bold("Performance Metrics:") + "\n" + table(rows, { textStyles: ["green"] }) + "\n" );
 	
 	// histograms
 	labels.forEach( function(label) {
@@ -366,8 +376,7 @@ var printReport = function() {
 		});
 		
 		print("\n");
-		print( bold(label + " Time Histogram:") + "\n" );
-		print( table(rows, {}) + "\n" );
+		print( bold(label + " Time Histogram:") + "\n" + table(rows, {}) + "\n" );
 	}); // histos
 	
 	print( "\n" );
@@ -522,7 +531,7 @@ async.timesLimit( max_iter, max_threads,
 				// In verbose mode, print every success and perf metrics
 				cli.progress.erase();
 				if(resp && resp.statusCode) { // resp null check
-					cli[is_warning ? 'warn' : 'verbose']( dateTimeStamp() + (is_warning ? bold.red("Perf Warning: ") : '') + 'Req #' + count + ": HTTP " + resp.statusCode + " " + resp.statusMessage + " -- " + JSON.stringify(metrics) + "\n" );
+					cli[is_warning ? 'warn' : 'verbose']( (is_warning ? bold.red("Perf Warning: ") : '') + 'Req #' + count + ": HTTP " + resp.statusCode + " " + resp.statusMessage + " -- " + JSON.stringify(metrics) + "\n" );
 				}
 				cli.progress.draw();
 			}
