@@ -519,14 +519,14 @@ async.timesLimit( max_iter, max_threads,
 				num_warns++;
 			}
 			
-			if (args.verbose || is_warning) {
+			if (resp && (args.verbose || is_warning)) {
 				// In verbose mode, print every success and perf metrics
 				cli.progress.erase();
 				cli[is_warning ? 'warn' : 'verbose']( dateTimeStamp() + (is_warning ? bold.red("Perf Warning: ") : '') + 'Req #' + count + ": HTTP " + resp.statusCode + " " + resp.statusMessage + " -- " + JSON.stringify(metrics) + "\n" );
 				cli.progress.draw();
 			}
 			
-			if (is_warning && args.warnings) {
+			if (resp && is_warning && args.warnings) {
 				var warn_data = Tools.mergeHashes( metrics, {
 					code: resp.statusCode,
 					status: resp.statusMessage,
