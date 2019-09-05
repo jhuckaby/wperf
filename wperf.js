@@ -59,7 +59,7 @@ var url = args.other.shift();
 
 print("\n");
 print( bold.magenta("WebPerf (wperf) v" + package.version) + "\n" );
-print( gray( bold("Date/Time: ") + (new Date()).toString() ) + "\n" );
+print( gray.bold("Date/Time: ") + gray((new Date()).toString() ) + "\n" );
 
 // first argument may be config file
 if (!url.match(/^\w+\:\/\//) && fs.existsSync(url)) {
@@ -71,7 +71,7 @@ if (!url.match(/^\w+\:\/\//) && fs.existsSync(url)) {
 	if (!config.url) {
 		die("Configuration file is missing required 'url' property: " + url + "\n");
 	}
-	print( gray( bold("Configuration: ") + url) + "\n" );
+	print( gray.bold("Configuration: ") + gray(url) + "\n" );
 	url = args.url || config.url;
 	for (var key in config) {
 		if (!(key in args)) args[key] = config[key];
@@ -96,12 +96,12 @@ if (("color" in args) && !args.color) {
 	cli.chalk.enabled = false;
 }
 
-if (args.params) print( gray( bold("Base URL: ") + url + " (" + method.toUpperCase() + ")") + "\n" );
-else print( gray( bold("URL: ") + url + " (" + method.toUpperCase() + ")") + "\n" );
+if (args.params) print( gray.bold("Base "));
+print( gray.bold("URL: ") + gray(url + " (" + method.toUpperCase() + ")") + "\n" );
 
 // print( gray( bold("Method: ") + method.toUpperCase()) + "\n" );
-print( gray( bold("Keep-Alives: ") + (keep_alive ? 'Enabled' : 'Disabled')) + "\n" );
-print( gray( bold("Threads: ") + max_threads) + "\n" );
+print( gray.bold("Keep-Alives: ") + gray(keep_alive ? 'Enabled' : 'Disabled') + "\n" );
+print( gray.bold("Threads: ") + gray(max_threads) + "\n" );
 
 // setup histogram system
 var histo = {};
