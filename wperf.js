@@ -56,13 +56,11 @@ if (!args.other || !args.other.length || args.help) {
 	process.exit(0);
 }
 var url = args.other.shift();
-
-print("\n");
-print( bold.magenta("WebPerf (wperf) v" + package.version) + "\n" );
-print( gray.bold("Date/Time: ") + gray((new Date()).toString() ) + "\n" );
+var config_file = '';
 
 // first argument may be config file
 if (!url.match(/^\w+\:\/\//) && fs.existsSync(url)) {
+	config_file = url;
 	var config = null;
 	try { config = JSON.parse( fs.readFileSync(url), 'utf8' ); }
 	catch (err) {
@@ -71,7 +69,6 @@ if (!url.match(/^\w+\:\/\//) && fs.existsSync(url)) {
 	if (!config.url) {
 		die("Configuration file is missing required 'url' property: " + url + "\n");
 	}
-	print( gray.bold("Configuration: ") + gray(url) + "\n" );
 	url = args.url || config.url;
 	for (var key in config) {
 		if (!(key in args)) args[key] = config[key];
@@ -94,6 +91,14 @@ var method = (args.method || 'get').toLowerCase();
 // optionally disable all ANSI color
 if (("color" in args) && !args.color) {
 	cli.chalk.enabled = false;
+}
+
+print("\n");
+print( bold.magenta("WebPerf (wperf) v" + package.version) + "\n" );
+print( gray.bold("Date/Time: ") + gray((new Date()).toString() ) + "\n" );
+
+if (config_file) {
+	print( gray.bold("Configuration: ") + gray(config_file) + "\n" );
 }
 
 if (args.params) print( gray.bold("Base "));
