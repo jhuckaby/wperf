@@ -184,6 +184,29 @@ If you simply want a random number on your URLs, you can use the `[#-#]` shortcu
 }
 ```
 
+You can optionally store your parameters in their own JSON file.  To use this feature, specify the file path using the `--params` command-line argument, or as a `params` string property in your configuration file.  Example of the latter:
+
+```json
+{
+	"url": "https://myserver.com/some/path?food=[food]",
+	"params": "my_params_file.json"
+}
+```
+
+And then the contents of `my_params_file.json` would be:
+
+```json
+{
+	"food": ["apple", "orange", "banana"]
+}
+```
+
+Here is an example of specifying the parameters file using the command line:
+
+```
+wperf https://myserver.com/some/path --params my_params_file.json
+```
+
 ### max
 
 The `max` parameter specifies the total number of HTTP requests to send (regardless of threads).  You can specify this on the command-line or in a configuration file.  The default is `1`.  Example:

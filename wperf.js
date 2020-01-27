@@ -75,6 +75,15 @@ if (!url.match(/^\w+\:\/\//) && fs.existsSync(url)) {
 	}
 }
 
+if (args.params && (typeof(args.params) == 'string')) {
+	// params may live in a separate file
+	var params_file = args.params;
+	try { args.params = JSON.parse( fs.readFileSync(params_file), 'utf8' ); }
+	catch (err) {
+		die("Failed to read parameters file: " + params_file + ": " + err + "\n");
+	}
+}
+
 // support string "false" as boolean false in certain cases
 if (args.compress === "false") args.compress = false;
 if (args.color === "false") args.color = false;
