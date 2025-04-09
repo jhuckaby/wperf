@@ -400,6 +400,9 @@ var nextIteration = function(err, callback) {
 			cli.progress.erase();
 			if (args.verbose) print("\n");
 			print( dateTimeStamp() + bold.red("ERROR: ") + err.message + "\n" );
+			if (args.verbose && err.headers) {
+				print( dateTimeStamp() + bold.yellow("Headers: ") + JSON.stringify(err.headers) + "\n" );
+			}
 			if (args.verbose && err.perf) {
 				var metrics = err.perf.metrics();
 				print( dateTimeStamp() + bold.yellow("Perf: ") + JSON.stringify(metrics) + "\n" );
@@ -517,9 +520,11 @@ async.timesLimit( max_iter, max_threads,
 				var text = data.toString();
 				if (success_match && !text.match(success_match)) {
 					err = new Error("Response does not contain success match (" + args.success_match + ")");
+					err.headers = resp.headers;
 				}
 				else if (error_match && text.match(error_match)) {
 					err = new Error("Response contains error match (" + args.error_match + ")");
+					err.headers = resp.headers;
 				}
 			}
 			
@@ -612,6 +617,9 @@ async.timesLimit( max_iter, max_threads,
 				print("\n");
 			}
 			print( dateTimeStamp() + bold.red("ERROR: ") + err.message + "\n" );
+			if (args.verbose && err.headers) {
+				print( dateTimeStamp() + bold.yellow("Headers: ") + JSON.stringify(err.headers) + "\n" );
+			}
 			if (args.verbose && err.perf) {
 				var metrics = err.perf.metrics();
 				print( dateTimeStamp() + bold.yellow("Perf: ") + JSON.stringify(metrics) + "\n" );
