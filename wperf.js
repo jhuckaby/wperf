@@ -217,6 +217,15 @@ for (var key in args) {
 	}
 }
 
+// Custom param override using p_ prefix
+for (var key in args) {
+	if (key.match(/^p_(.+)$/)) {
+		var param_name = RegExp.$1;
+		if (!args.params) args.params = {};
+		args.params[ param_name ] = args[key];
+	}
+}
+
 // Set User-Agent string, allow full customization
 var request = new PixlRequest( args.useragent || ("Mozilla/5.0; wperf/" + package.version) );
 request.setAutoError( true );
@@ -400,6 +409,9 @@ var nextIteration = function(err, callback) {
 			cli.progress.erase();
 			if (args.verbose) print("\n");
 			print( dateTimeStamp() + bold.red("ERROR: ") + err.message + "\n" );
+			if (args.verbose && err.url) {
+				print( dateTimeStamp() + bold.yellow("URL: ") + err.url + "\n" );
+			}
 			if (args.verbose && err.headers) {
 				print( dateTimeStamp() + bold.yellow("Headers: ") + JSON.stringify(err.headers) + "\n" );
 			}
@@ -496,6 +508,7 @@ async.timesLimit( max_iter, max_threads,
 		
 		// send HTTP request
 		request[method]( current_url, current_opts, function(err, resp, data, perf) {
+			if (err) err.url = current_url;
 			
 			// Track req/sec
 			var now_sec = Tools.timeNow(true);
@@ -617,6 +630,9 @@ async.timesLimit( max_iter, max_threads,
 				print("\n");
 			}
 			print( dateTimeStamp() + bold.red("ERROR: ") + err.message + "\n" );
+			if (args.verbose && err.url) {
+				print( dateTimeStamp() + bold.yellow("URL: ") + err.url + "\n" );
+			}
 			if (args.verbose && err.headers) {
 				print( dateTimeStamp() + bold.yellow("Headers: ") + JSON.stringify(err.headers) + "\n" );
 			}

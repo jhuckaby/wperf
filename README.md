@@ -72,19 +72,19 @@ During a run, the script will display a graphical progress bar with estimated ti
 
 Use [npm](https://www.npmjs.com/) to install the module as a command-line executable:
 
-```
+```sh
 npm install -g wperf
 ```
 
 Then call it using `wperf` and specify your URL and options on the command-line:
 
-```
+```sh
 wperf URL [--OPTION1 --OPTION2 ...]
 ```
 
 Example command:
 
-```
+```sh
 wperf https://myserver.com/some/path --max 100 --threads 2 --keepalive
 ```
 
@@ -92,13 +92,13 @@ This would send an HTTP GET request to the specified URL 100 times using 2 threa
 
 Alternatively, you can store all your configuration settings in a JSON file, and specify it as the first argument (see below for details on how to format the JSON file):
 
-```
+```sh
 wperf my-load-test.json
 ```
 
 You can also include command-line arguments after the configuration file which acts as overrides:
 
-```
+```sh
 wperf my-load-test.json --verbose
 ```
 
@@ -110,7 +110,7 @@ You can specify most configuration options on the command line (using the syntax
 
 Use the command-line `--url` or JSON `url` property to specify the URL to be requested.  As a shortcut, the URL can be specified as the first argument to the command-line script, without the `--url` prefix.  Example command-line:
 
-```
+```sh
 wperf https://myserver.com/some/path
 ```
 
@@ -203,15 +203,46 @@ And then the contents of `my_params_file.json` would be:
 
 Here is an example of specifying the parameters file using the command line:
 
-```
+```sh
 wperf https://myserver.com/some/path --params my_params_file.json
+```
+
+You can override individual parameters using the `p_` prefix on the command line like this:
+
+```sh
+wperf https://myserver.com/some/path --p_food orange
+```
+
+Another use of this is to make the hostname portion of the URL configurable, but have the rest of the URL be hard-coded or based on parameters in the config file.  Example:
+
+```json
+{
+	"url": "https://[host][uri]",
+	"params": {
+		"host": [
+			"myserver.com"
+		],
+		"uri": [
+			"/some/path?&action=eat&food=[food]",
+			"/some/other/path?&action=drink&beverage=[beverage]"
+		],
+		"food": ["apple", "orange", "banana"],
+		"beverage": ["coke", "pepsi"]
+	}
+}
+```
+
+Then you can customize just the hostname per test run like this:
+
+```sh
+wperf my-config-file.json --p_host myOTHERserver.com
 ```
 
 ### max
 
 The `max` parameter specifies the total number of HTTP requests to send (regardless of threads).  You can specify this on the command-line or in a configuration file.  The default is `1`.  Example:
 
-```
+```sh
 wperf https://myserver.com/some/path --max 100
 ```
 
@@ -228,7 +259,7 @@ Example JSON configuration:
 
 The `threads` parameter specifies the number of "threads" (i.e. concurrent HTTP requests) to send.  You can specify this on the command-line or in a configuration file.  The default is `1`.  Example:
 
-```
+```sh
 wperf https://myserver.com/some/path --max 100 --threads 4
 ```
 
@@ -246,7 +277,7 @@ Example JSON configuration:
 
 The `keepalive` parameter, when present on the command-line or set to `true` in your JSON configuration, enables [HTTP Keep-Alives](https://en.wikipedia.org/wiki/HTTP_persistent_connection) for all requests.  This means that sockets will be reused whenever possible (if the target server supports it and doesn't close the socket itself).  The default behavior is to disable Keep-Alives, and open a new socket for every request.  Example use:
 
-```
+```sh
 wperf https://myserver.com/some/path --max 100 --keepalive
 ```
 
@@ -266,7 +297,7 @@ Of course, Keep-Alives only take effect if you send more than one request.
 
 The `throttle` parameter allows you to set a maximum requests per second limit, which the script will always stay under, regardless of the number of threads.  You can specify this on the command-line or in a configuration file.  The default is *unlimited*.  Example use:
 
-```
+```sh
 wperf https://myserver.com/some/path --max 100 --throttle 10
 ```
 
@@ -284,7 +315,7 @@ Example JSON configuration:
 
 The `timeout` parameter allows you to specify a maximum time for requests in seconds, before they are aborted and considered an error.  This is measured as the [time to first byte](https://en.wikipedia.org/wiki/Time_to_first_byte), and is specified as seconds.  You can set this on the command-line or in a configuration file.  The default is `5` seconds.  The value can be a floating point decimal (fractional seconds).  Example use:
 
-```
+```sh
 wperf https://myserver.com/some/path --timeout 2.5
 ```
 
@@ -301,7 +332,7 @@ Example JSON configuration:
 
 The `warn` parameter allows you to specify a maximum time for requests in seconds, before they are logged as a warning.  You can set this on the command-line or in a configuration file.  The default is `1` second.  The value can be a floating point decimal (fractional seconds).  Example use:
 
-```
+```sh
 wperf https://myserver.com/some/path --warn 0.5
 ```
 
@@ -324,7 +355,7 @@ Warnings are printed to STDERR, and contain a date/time stamp (local time), the 
 
 If you would prefer warnings in a more machine-readable format, you can have them logged to a file using [newline delimited JSON](http://ndjson.org/) format.  To enable this, include the `--warnings` command-line argument followed by a log file path, or use the `warnings` configuration property.  Example use:
 
-```
+```sh
 wperf https://myserver.com/some/path --warn 0.5 --warnings /var/log/my-warning-log.ndjson
 ```
 
@@ -381,7 +412,7 @@ Here are descriptions of the properties:
 
 The `fatal` parameter, when present on the command-line or set to `true` in your JSON configuration, will cause the first HTTP error response to abort the entire run.  By default this is disabled, and the script continues after encountering errors.  Example use:
 
-```
+```sh
 wperf https://myserver.com/some/path --fatal
 ```
 
@@ -398,7 +429,7 @@ Example JSON configuration:
 
 The `verbose` parameter, when present on the command-line or set to `true` in your JSON configuration, outputs information about every single request just as it completes.  Example use:
 
-```
+```sh
 wperf https://myserver.com/some/path --verbose
 ```
 
@@ -427,7 +458,7 @@ Similar to the [warn](#warn) output, these lines contain a date/time stamp (loca
 
 The `cache_dns` parameter, when present on the command-line or set to `true` in your JSON configuration, will cache the IP addresses from DNS lookups, so they only need to be requested once per unique domain name.  Example use:
 
-```
+```sh
 wperf https://myserver.com/some/path --cache_dns
 ```
 
@@ -444,7 +475,7 @@ Example JSON configuration:
 
 The `auth` parameter allows you to include [HTTP Basic Authentication](https://en.wikipedia.org/wiki/Basic_access_authentication) credentials (i.e. username and password).  These should be delimited by a colon (`:`) character.  You can set this on the command-line or in a configuration file.  Example:
 
-```
+```sh
 wperf https://myserver.com/some/path --auth "jsmith:12345"
 ```
 
@@ -461,7 +492,7 @@ Example JSON configuration:
 
 By default, the request library supports compressed server responses (i.e. Gzip or Deflate content encoding), and announces support for these via the `Accept-Encoding` header.  The `compress` property allows you to *disable* compression support in the request library.  Specifically, disabling compression means that an `Accept-Encoding: none` header is sent with every request, informing the target server that the client doesn't support a compressed response.  You can set this property to `false` on the command-line or in a configuration file.  Example:
 
-```
+```sh
 wperf https://myserver.com/some/path --compress false
 ```
 
@@ -480,7 +511,7 @@ Example JSON configuration:
 
 The `useragent` parameter allows you to specify a custom `User-Agent` request header.  By default, this is set to `Mozilla/5.0; wperf/1.0.0`.  You can set this property on the command-line or in a configuration file.  Example:
 
-```
+```sh
 wperf https://myserver.com/some/path --useragent "My Custom Agent v1.2.3"
 ```
 
@@ -497,7 +528,7 @@ Example JSON configuration:
 
 The `follow` parameter, when present on the command-line or set to `true` in your JSON configuration, will cause the HTTP request library to automatically follow redirects.  That is, HTTP response codes in the `3xx` range, with an accompanying `Location` response header.  You can set this property on the command-line or in a configuration file.  Example:
 
-```
+```sh
 wperf https://myserver.com/some/path --follow
 ```
 
@@ -518,7 +549,7 @@ Alternatively, you can set this parameter to a number value, which represents th
 
 The `retries` parameter allows you to set a number of retries before an error is logged, and possibly [fatal](#fatal).  The default is `0` retries.  You can set this property on the command-line or in a configuration file.  Example:
 
-```
+```sh
 wperf https://myserver.com/some/path --retries 5
 ```
 
@@ -537,7 +568,7 @@ Example JSON configuration:
 
 By default, when HTTPS requests are made, the SSL certificate is verified using a Certificate Authority (CA).  The `insecure` parameter, when present on the command-line or set to `true` in your JSON configuration, will cause the request library to bypass all SSL certificate verification.  One potential use of this is for self-signed certificates.  Example:
 
-```
+```sh
 wperf https://myserver.com/some/path --insecure
 ```
 
@@ -554,7 +585,7 @@ Example JSON configuration:
 
 The `headers` parameter allows you to add custom HTTP headers to every request.  These can be specified on the command-line using a `h_` prefix followed by the header name, then the header value.  You can repeat this for adding multiple headers.  Example:
 
-```
+```sh
 wperf https://myserver.com/some/path --h_Cookie "sessionid=1234567890;"
 ```
 
@@ -575,7 +606,7 @@ The underlying request library also adds a few basic headers of its own, includi
 
 The `method` parameter allows you to set the HTTP method for all requests sent.  By default this is `GET`, but you can set it to any of the standard values, i.e. `GET`, `HEAD`, `POST`, `PUT` and `DELETE`.  You can set this property on the command-line or in a configuration file.  Example:
 
-```
+```sh
 wperf https://myserver.com/some/path --method HEAD
 ```
 
@@ -592,7 +623,7 @@ Example JSON configuration:
 
 If you select any of the HTTP methods that support a request body, e.g. `POST`, `PUT` or `DELETE`, you can specify the data in a number of different ways.  By default, it is sent as `application/x-www-form-urlencoded`, and you can specify named parameters on the command-line using a `d_` prefix like this:
 
-```
+```sh
 wperf https://myserver.com/some/path --method POST --d_username jsmith --d_email jsmith@aol.com
 ```
 
@@ -611,7 +642,7 @@ This would serialize the two post parameters using standard form encoding, resul
 
 Alternatively, you can specify the request body in "raw" format using the `--data` command-line argument (or `data` configuration property) by setting it to a string.  This can be used to send a pure JSON post, for example:
 
-```
+```sh
 wperf https://myserver.com/some/path --method POST --h_Content-Type application/json --data '{"username":"jsmith","email":"jsmith@aol.com"}'
 ```
 
@@ -632,7 +663,7 @@ Or similarly via configuration file:
 
 To send a "multipart" HTTP POST, which is designed more for larger parameters (also see [files](#files)), include the `--multipart` parameter on the command-line, or set the `multipart` JSON configuration property to `true`.  Example of this:
 
-```
+```sh
 wperf https://myserver.com/some/path --method POST --multipart --d_username jsmith --d_email jsmith@aol.com
 ```
 
@@ -654,7 +685,7 @@ And in JSON configuration format:
 
 If you are performing a multipart HTTP POST, you can upload actual files from the local filesystem.  These can be specified on the command-line using the `f_` prefix, or in a configuration file using a `files` object.  Here are examples of each:
 
-```
+```sh
 wperf https://myserver.com/some/path --method POST --multipart --f_file1 /path/to/my/file.jpg
 ```
 
@@ -677,7 +708,7 @@ In this case the file is identified by the parameter name `file1`.  The filename
 
 The `success_match` parameter allows you to specify a [regular expression](https://en.wikipedia.org/wiki/Regular_expression) that must match against the server response content body in order for the request to be considered a success.  You can set this property on the command-line or in a configuration file.  Example:
 
-```
+```sh
 wperf https://myserver.com/some/path --success_match "Operation was successful"
 ```
 
@@ -694,7 +725,7 @@ Example JSON configuration:
 
 The `error_match` parameter allows you to specify a [regular expression](https://en.wikipedia.org/wiki/Regular_expression) that generates an error when it matches the server response content body.  You can set this property on the command-line or in a configuration file.  Example:
 
-```
+```sh
 wperf https://myserver.com/some/path --error_match "Database failure"
 ```
 
@@ -723,7 +754,7 @@ Normally `wperf` outputs a histogram of the "Total Time" metric, which is the fu
 
 To specify additional histograms, include the `--histo` argument on the command-line, set to a comma-separate list of any of the metrics defined above.  Or you can use the special keyword `all` to generate histograms for *all* of them.  Example:
 
-```
+```sh
 wperf https://myserver.com/some/path --histo "dns,connect,receive"
 ```
 
@@ -799,7 +830,7 @@ You can customize these lanes by specifying a `histo_ranges` key in your JSON co
 
 If you would like `wperf` to output more machine-readable statistics, you can do so by adding the `--stats` command-line argument, or the `stats` configuration property.  Example use:
 
-```
+```sh
 wperf https://myserver.com/some/path --stats
 ```
 
@@ -914,7 +945,7 @@ Each of the HTTP performance objects contain the following properties:
 
 To suppress all `wperf` script output (with some exceptions -- see below), include the `--quiet` argument on the command-line, or set the `quiet` JSON configuration property to `true`.  Example:
 
-```
+```sh
 wperf https://myserver.com/some/path --quiet
 ```
 
@@ -936,7 +967,7 @@ This will cause all output to be suppressed, with these two exceptions:
 
 By default, `wperf` outputs its reports and tables using ANSI colors in your terminal.  However, if for some reason you don't want color output, you can disable it by either setting the `--color` command-line argument to `false`, or setting the `color` JSON configuration property to `false`.  Example:
 
-```
+```sh
 wperf https://myserver.com/some/path --color false
 ```
 
@@ -957,7 +988,7 @@ Example JSON configuration:
 
 The feature is activated by the `--wrapper` command-line argument, or the `wrapper` JSON configuration property.  Either way, it should be set to a filesystem path pointing at your Node.js script.  Example:
 
-```
+```sh
 wperf https://myserver.com/some/path --wrapper /path/to/my-request-wrapper.js
 ```
 
@@ -1025,7 +1056,7 @@ Upon the completion of each request, success or fail, the callback function expe
 
 **The MIT License**
 
-*Copyright (c) 2019 Joseph Huckaby.*
+*Copyright (c) 2019 - 2025 Joseph Huckaby.*
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
