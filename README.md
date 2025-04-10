@@ -600,6 +600,17 @@ If using a JSON configuration file, you can instead use a `headers` object, with
 }
 ```
 
+You can also use placeholder macros in your header values, which will be expanded with matching [params](#params).  Example:
+
+```json
+{
+	"url": "https://myserver.com/some/path",
+	"headers": {
+		"Cookie": "sessionid=[session_id];"
+	}
+}
+```
+
 The underlying request library also adds a few basic headers of its own, including `Host`, `Connection`, `Accept-Encoding` and `User-Agent`.
 
 ### method

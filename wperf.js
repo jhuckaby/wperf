@@ -506,6 +506,13 @@ async.timesLimit( max_iter, max_threads,
 			return '';
 		}).trim();
 		
+		// allow placeholder substitution inside header values as well
+		for (var key in current_opts.headers) {
+			current_opts.headers[key] = current_opts.headers[key].toString().replace( /\[(\w+)\]/g, function(m_all, key) {
+				return params[key] ? Tools.randArray(params[key]) : '';
+			});
+		}
+		
 		// send HTTP request
 		request[method]( current_url, current_opts, function(err, resp, data, perf) {
 			if (err) err.url = current_url;
