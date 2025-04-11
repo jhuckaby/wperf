@@ -532,6 +532,12 @@ async.timesLimit( max_iter, max_threads,
 			}
 		}
 		
+		if (args.verbose) {
+			print( dateTimeStamp() + bold.green("Request URL: ") + current_url + "\n" );
+			if (current_opts.data) print( dateTimeStamp() + bold.green("POST Data: ") + JSON.stringify(current_opts.data) + "\n" );
+			if (current_opts.headers && Tools.numKeys(current_opts.headers)) print( dateTimeStamp() + bold.green("Request Headers: ") + JSON.stringify(current_opts.headers) + "\n" );
+		}
+		
 		// send HTTP request
 		request[method]( current_url, current_opts, function(err, resp, data, perf) {
 			if (err) err.url = current_url;
