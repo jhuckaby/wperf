@@ -46,6 +46,7 @@ var PixlRequest = require('pixl-request');
 var cli = require('pixl-cli');
 cli.global();
 
+var Tools = cli.Tools;
 var async = Tools.async;
 
 // Process CLI args
@@ -412,6 +413,9 @@ var nextIteration = function(err, callback) {
 			if (args.verbose && err.url) {
 				print( dateTimeStamp() + bold.yellow("URL: ") + err.url + "\n" );
 			}
+			if (args.verbose && err.content) {
+				print( dateTimeStamp() + bold.yellow("Content: ") + JSON.stringify(err.content) + "\n" );
+			}
 			if (args.verbose && err.headers) {
 				print( dateTimeStamp() + bold.yellow("Headers: ") + JSON.stringify(err.headers) + "\n" );
 			}
@@ -481,8 +485,7 @@ for (var key in params) {
 // Main request loop
 async.timesLimit( max_iter, max_threads,
 	function(idx, callback) {
-		var current_opts = Object.assign({}, opts);
-		current_opts.headers = Object.assign({}, opts.headers);
+		var current_opts = Tools.copyHash( opts, true );
 		var current_url = url;
 		var ebrake = 0;
 		
@@ -513,6 +516,22 @@ async.timesLimit( max_iter, max_threads,
 			});
 		}
 		
+		// allow placeholder sub in post data, if raw string or hash
+		if (current_opts.data) {
+			if (typeof(current_opts.data) == 'string') {
+				current_opts.data = current_opts.data.replace( /\[(\w+)\]/g, function(m_all, key) {
+					return params[key] ? Tools.randArray(params[key]) : '';
+				});
+			}
+			else if (Tools.isaHash(current_opts.data)) {
+				for (var key in current_opts.data) {
+					current_opts.data[key] = current_opts.data[key].toString().replace( /\[(\w+)\]/g, function(m_all, key) {
+						return params[key] ? Tools.randArray(params[key]) : '';
+					});
+				}
+			}
+		}
+		
 		// send HTTP request
 		request[method]( current_url, current_opts, function(err, resp, data, perf) {
 			if (err) err.url = current_url;
@@ -541,10 +560,12 @@ async.timesLimit( max_iter, max_threads,
 				if (success_match && !text.match(success_match)) {
 					err = new Error("Response does not contain success match (" + args.success_match + ")");
 					err.headers = resp.headers;
+					err.content = text;
 				}
 				else if (error_match && text.match(error_match)) {
 					err = new Error("Response contains error match (" + args.error_match + ")");
 					err.headers = resp.headers;
+					err.content = text;
 				}
 			}
 			
@@ -639,6 +660,9 @@ async.timesLimit( max_iter, max_threads,
 			print( dateTimeStamp() + bold.red("ERROR: ") + err.message + "\n" );
 			if (args.verbose && err.url) {
 				print( dateTimeStamp() + bold.yellow("URL: ") + err.url + "\n" );
+			}
+			if (args.verbose && err.content) {
+				print( dateTimeStamp() + bold.yellow("Content: ") + JSON.stringify(err.content) + "\n" );
 			}
 			if (args.verbose && err.headers) {
 				print( dateTimeStamp() + bold.yellow("Headers: ") + JSON.stringify(err.headers) + "\n" );

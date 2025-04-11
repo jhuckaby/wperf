@@ -607,6 +607,9 @@ You can also use placeholder macros in your header values, which will be expande
 	"url": "https://myserver.com/some/path",
 	"headers": {
 		"Cookie": "sessionid=[session_id];"
+	},
+	"params": {
+		"session_id": ["1234567890", "abcdefghij", "qrstuvwxyz"]
 	}
 }
 ```
@@ -667,6 +670,22 @@ Or similarly via configuration file:
 		"Content-Type": "application/json"
 	},
 	"data": "{\"username\":\"jsmith\",\"email\":\"jsmith@aol.com\"}"
+}
+```
+
+You can also use placeholder macros in your data, which will be expanded with matching [params](#params).  Example:
+
+```json
+{
+	"url": "https://myserver.com/some/path",
+	"method": "POST",
+	"headers": {
+		"Content-Type": "application/json"
+	},
+	"data": "{\"username\":\"jsmith\",\"sessionid\":\"[session_id]\"}",
+	"params": {
+		"session_id": ["1234567890", "abcdefghij", "qrstuvwxyz"]
+	}
 }
 ```
 
