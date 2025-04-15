@@ -218,12 +218,15 @@ for (var key in args) {
 	}
 }
 
-// Custom param override using p_ prefix
+// Custom param override using p_ prefix, or if a param already exists with the same name, no prefix is needed
 for (var key in args) {
 	if (key.match(/^p_(.+)$/)) {
 		var param_name = RegExp.$1;
 		if (!args.params) args.params = {};
 		args.params[ param_name ] = args[key];
+	}
+	else if (args.params && args.params[key]) {
+		args.params[ key ] = args[key];
 	}
 }
 
@@ -533,9 +536,9 @@ async.timesLimit( max_iter, max_threads,
 		}
 		
 		if (args.verbose) {
-			print( dateTimeStamp() + bold.green("Request URL: ") + current_url + "\n" );
-			if (current_opts.data) print( dateTimeStamp() + bold.green("POST Data: ") + JSON.stringify(current_opts.data) + "\n" );
-			if (current_opts.headers && Tools.numKeys(current_opts.headers)) print( dateTimeStamp() + bold.green("Request Headers: ") + JSON.stringify(current_opts.headers) + "\n" );
+			print( dateTimeStamp() + bold.cyan("Request URL: ") + current_url + "\n" );
+			if (current_opts.data) print( dateTimeStamp() + bold.cyan("POST Data: ") + JSON.stringify(current_opts.data) + "\n" );
+			if (current_opts.headers && Tools.numKeys(current_opts.headers)) print( dateTimeStamp() + bold.cyan("Request Headers: ") + JSON.stringify(current_opts.headers) + "\n" );
 		}
 		
 		// send HTTP request
@@ -651,6 +654,12 @@ async.timesLimit( max_iter, max_threads,
 			}
 			else {
 				// URL request was a success
+				if (args.verbose) {
+					print( dateTimeStamp() + bold.green("Response Status: ") + resp.statusCode + " " + resp.statusMessage + "\n" );
+					print( dateTimeStamp() + bold.green("Response Content: ") + JSON.stringify(data.toString()) + "\n" );
+					print( dateTimeStamp() + bold.green("Response Headers: ") + JSON.stringify(resp.headers) + "\n" );
+				}
+				
 				nextIteration(null, callback);
 			}
 		} );

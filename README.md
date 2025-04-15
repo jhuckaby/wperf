@@ -207,10 +207,10 @@ Here is an example of specifying the parameters file using the command line:
 wperf https://myserver.com/some/path --params my_params_file.json
 ```
 
-You can override individual parameters using the `p_` prefix on the command line like this:
+You can override individual parameters on the command line like this:
 
 ```sh
-wperf https://myserver.com/some/path --p_food orange
+wperf https://myserver.com/some/path --food orange
 ```
 
 Another use of this is to make the hostname portion of the URL configurable, but have the rest of the URL be hard-coded or based on parameters in the config file.  Example:
@@ -235,7 +235,7 @@ Another use of this is to make the hostname portion of the URL configurable, but
 Then you can customize just the hostname per test run like this:
 
 ```sh
-wperf my-config-file.json --p_host myOTHERserver.com
+wperf my-config-file.json --host myOTHERserver.com
 ```
 
 ### max

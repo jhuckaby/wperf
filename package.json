@@ -1,6 +1,6 @@
 {
   "name": "wperf",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "A simple HTTP load testing utility with detailed performance metrics.",
   "author": "Joseph Huckaby <jhuckaby@gmail.com>",
   "homepage": "https://github.com/jhuckaby/wperf",
