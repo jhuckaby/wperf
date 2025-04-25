@@ -597,6 +597,7 @@ async.timesLimit( max_iter, max_threads,
 			
 			if (resp && is_warning && args.warnings) {
 				var warn_data = Tools.mergeHashes( metrics, {
+					url: current_url,
 					code: resp.statusCode,
 					status: resp.statusMessage,
 					req_num: count,
@@ -604,6 +605,17 @@ async.timesLimit( max_iter, max_threads,
 					date_time: dateTimeStamp().trim()
 				});
 				fs.appendFileSync( args.warnings, JSON.stringify(warn_data) + "\n" );
+			}
+			if (resp && args.log) {
+				var log_data = Tools.mergeHashes( metrics, {
+					url: current_url,
+					code: resp.statusCode,
+					status: resp.statusMessage,
+					req_num: count,
+					now: now_sec,
+					date_time: dateTimeStamp().trim()
+				});
+				fs.appendFileSync( args.log, JSON.stringify(log_data) + "\n" );
 			}
 			
 			// Compute min/avg/max stats
