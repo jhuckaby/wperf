@@ -408,6 +408,26 @@ Here are descriptions of the properties:
 | `now` | This is the current date/time expressed as [Epoch](https://en.wikipedia.org/wiki/Unix_time) seconds. |
 | `date_time` | This is the current date/time expressed as a string in the local timezone. |
 
+### log
+
+Building upon [warnings](#warnings) discussed above, you can also tell wperf to log *every request* regardless if it is a warning or not.  To do this, include the `--log` command-line argument followed by a log file path, or use the `log` configuration property.  Example use:
+
+```sh
+wperf https://myserver.com/some/path --warn 0.5 --log /var/log/my-req-log.ndjson
+```
+
+Example JSON configuration:
+
+```json
+{
+	"url": "https://myserver.com/some/path",
+	"warn": 0.5,
+	"log": "/var/log/my-req-log.ndjson"
+}
+```
+
+See [warnings](#warnings) above for details on the [NDJSON](http://ndjson.org/) logging format.
+
 ### fatal
 
 The `fatal` parameter, when present on the command-line or set to `true` in your JSON configuration, will cause the first HTTP error response to abort the entire run.  By default this is disabled, and the script continues after encountering errors.  Example use:
