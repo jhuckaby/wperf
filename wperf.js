@@ -597,7 +597,6 @@ async.timesLimit( max_iter, max_threads,
 			
 			if (resp && is_warning && args.warnings) {
 				var warn_data = Tools.mergeHashes( metrics, {
-					url: current_url,
 					code: resp.statusCode,
 					status: resp.statusMessage,
 					req_num: count,
@@ -608,7 +607,6 @@ async.timesLimit( max_iter, max_threads,
 			}
 			if (resp && args.log) {
 				var log_data = Tools.mergeHashes( metrics, {
-					url: current_url,
 					code: resp.statusCode,
 					status: resp.statusMessage,
 					req_num: count,
