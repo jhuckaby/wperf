@@ -390,7 +390,7 @@ Here is an example warning log entry (the JSON has been pretty-printed for displ
 	"code": 200,
 	"status": "OK",
 	"req_num": 1,
-	"now": 1567295312,
+	"now": 1567295312.123,
 	"date_time": "[2019/08/31 16:48:32]"
 }
 ```

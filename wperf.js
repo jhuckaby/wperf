@@ -546,7 +546,8 @@ async.timesLimit( max_iter, max_threads,
 			if (err) err.url = current_url;
 			
 			// Track req/sec
-			var now_sec = Tools.timeNow(true);
+			var now = Tools.timeNow();
+			var now_sec = Math.floor(now);
 			stats.count_sec++;
 			stats.total_reqs++;
 			
@@ -600,7 +601,7 @@ async.timesLimit( max_iter, max_threads,
 					code: resp.statusCode,
 					status: resp.statusMessage,
 					req_num: count,
-					now: now_sec,
+					now: now,
 					date_time: dateTimeStamp().trim()
 				});
 				fs.appendFileSync( args.warnings, JSON.stringify(warn_data) + "\n" );
@@ -610,7 +611,7 @@ async.timesLimit( max_iter, max_threads,
 					code: resp.statusCode,
 					status: resp.statusMessage,
 					req_num: count,
-					now: now_sec,
+					now: now,
 					date_time: dateTimeStamp().trim()
 				});
 				fs.appendFileSync( args.log, JSON.stringify(log_data) + "\n" );
