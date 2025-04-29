@@ -15,6 +15,7 @@
 		+ [timeout](#timeout)
 		+ [warn](#warn)
 		+ [warnings](#warnings)
+		+ [log](#log)
 		+ [fatal](#fatal)
 		+ [verbose](#verbose)
 		+ [cache_dns](#cache_dns)
